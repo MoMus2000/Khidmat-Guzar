@@ -7,8 +7,10 @@ use std::str;
 const BUFFER_SIZE : usize = 8096;
 
 // Things to do
-// 2. Do code cleanup and learn how arc mutex works
-// 3. Explore HTTP Protocol and work towards implementation
+// . Do code cleanup and learn how arc mutex works
+// . Explore ncurses or alternatives for a tui
+// . Explore Command pattern from zozin
+// . Explore HTTP Protocol and work towards implementation
 
 struct TcpServer{
     connections: Option<Vec::<TcpStream>>,
@@ -27,12 +29,11 @@ impl TcpServer{
         }
     }
 
-    // fn write_to_all_connections(streams: &mut Vec<TcpStream>, current_stream: TcpStream){
-    //     for st in streams{
-    //         let message = format!("New Connection {}\n", current_stream.local_addr().unwrap().to_string());
-    //         st.write_all(message.as_bytes());
-    //     }
-    // }
+    fn broadcast_to_all_connections(msg: &str, shared_data: Arc<Mutex<Vec<TcpStream>>>){
+        for stream in shared_data.lock().unwrap().iter_mut(){
+            let _ = stream.write_all(msg.as_bytes());
+        }
+    }
 
     fn start_server(&mut self){
         let address = format!("{}:{}", self.address, self.port);
@@ -83,11 +84,10 @@ impl TcpServer{
                 Ok(len) =>{
                     let string_result = str::from_utf8(&buffer[0..len]);
                     match string_result {
-                        Ok(res) => {
-                            print!("{}", res);
-                            for mut stream in shared_data.lock().unwrap().iter_mut(){
-                                stream.write_all(res.as_bytes());
-                            }
+                        Ok(msg) => {
+                            print!("{}", msg);
+                            let data_clone = Arc::clone(&shared_data);
+                            TcpServer::broadcast_to_all_connections(msg, data_clone);
                         },
                         Err(e)=>{
                             eprintln!("Something went wrong: {}", e);
