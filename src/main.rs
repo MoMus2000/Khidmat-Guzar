@@ -1,9 +1,10 @@
 use std::net::{TcpListener, TcpStream};
-use std::io::{Error, Write};
+use std::str;
+use std::io::{Error, Read, Write};
 
 fn serve(address: String){
     println!("Serving @ {}", address);
-    let mut stream = TcpListener::bind(address);
+    let stream = TcpListener::bind(address);
     let listener = stream.expect("Server should have started");
     for stream in listener.incoming(){
         handle_request(stream)
@@ -13,8 +14,14 @@ fn serve(address: String){
 fn handle_request(res: Result<TcpStream, Error>){
     println!("Got the request, handling it now !");
     let mut stream_data = res.unwrap();
-    let buffer  = "Some Data \n".as_bytes();
-    stream_data.write_all(buffer);
+    let buffer  = "Connected .. Send some data over. \n".as_bytes();
+    stream_data.write_all(buffer).expect("Should have sent the data");
+    let mut buffer = [0; 11];
+    loop{
+        let length_of_chars = stream_data.read(&mut buffer).expect("Unable to read from buffer");
+        println!("Length of data got back {}", length_of_chars);
+        println!("{:?}", str::from_utf8(&buffer[0..length_of_chars]).unwrap());
+    }
 }
 
 fn main() {
