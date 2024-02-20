@@ -5,9 +5,9 @@ use std::thread;
 use std::str;
 
 const BUFFER_SIZE : usize = 8096;
+
 // Things to do
-// 1. Graceful shutdown of connection
-// 2. Handle connections from multiple clients
+// 2. Do code cleanup and learn how arc mutex works
 // 3. Explore HTTP Protocol and work towards implementation
 
 struct TcpServer{
@@ -27,12 +27,12 @@ impl TcpServer{
         }
     }
 
-    fn write_to_all_connections(streams: &mut Vec<TcpStream>, current_stream: TcpStream){
-        for st in streams{
-            let message = format!("New Connection {}\n", current_stream.local_addr().unwrap().to_string());
-            st.write_all(message.as_bytes());
-        }
-    }
+    // fn write_to_all_connections(streams: &mut Vec<TcpStream>, current_stream: TcpStream){
+    //     for st in streams{
+    //         let message = format!("New Connection {}\n", current_stream.local_addr().unwrap().to_string());
+    //         st.write_all(message.as_bytes());
+    //     }
+    // }
 
     fn start_server(&mut self){
         let address = format!("{}:{}", self.address, self.port);
@@ -53,7 +53,7 @@ impl TcpServer{
                     shared_vector.push(clone3);
 
                     self.connections.as_mut().unwrap().push(clone);
-                    TcpServer::write_to_all_connections(self.connections.as_mut().unwrap(), stream.try_clone().unwrap());
+                    // TcpServer::write_to_all_connections(self.connections.as_mut().unwrap(), stream.try_clone().unwrap());
                     let clone2 = stream.try_clone().unwrap();
                     
                     let data_processor = Arc::clone(&shared_data);
@@ -88,7 +88,6 @@ impl TcpServer{
                             for mut stream in shared_data.lock().unwrap().iter_mut(){
                                 stream.write_all(res.as_bytes());
                             }
-                            println!("Current size {}", shared_data.lock().unwrap().len())
                         },
                         Err(e)=>{
                             eprintln!("Something went wrong: {}", e);
