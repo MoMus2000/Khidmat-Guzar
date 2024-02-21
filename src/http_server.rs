@@ -87,16 +87,36 @@ impl HttpServer{
     }
 
     fn write_http_status(mut stream: TcpStream){
-        let response_line = b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+
+        let response_line = b"HTTP/1.1 200 OK\r\n";
+        let header_1 = b"Server: Crude Server\r\n";
+        let header_2 = b"Content-type: text/html\r\n";
+        let blank_line = b"\r\n";
+        let html = b"
+        <html>
+            <head></head>
+            <body><h1>Hey This is my first http server</h1></body>
+       </html>\r\n
+        ";
+
+        // Calculate the length of the HTML content
+        let content_length = html.len().to_string();
+        let content_length_header = format!("Content-Length: {}\r\n", content_length);
 
         let response: Vec<u8> = [
-        response_line.iter(),
+
+            response_line.iter(),
+            header_1.iter(),
+            header_2.into_iter(),
+            content_length_header.as_bytes().into_iter(),
+            blank_line.into_iter(),
+            html.into_iter(),
+
         ]
         .into_iter()
         .flatten()
         .cloned()
         .collect();
-
 
         match stream.write_all(&response){
             Ok(_)=>{},
