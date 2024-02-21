@@ -8,6 +8,7 @@ use crate::server::Server;
 mod server;
 mod tcp;
 mod http_server;
+mod http;
 
 
 fn main() {

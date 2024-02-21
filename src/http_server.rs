@@ -5,6 +5,7 @@ use std::io::{Write, Read};
 use std::str;
 
 use crate::server::Server;
+use crate::http::http_builder;
 
 pub struct HttpServer{
     address: String,
