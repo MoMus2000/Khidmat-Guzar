@@ -14,6 +14,16 @@ when we a handle the request, we have the connection available
 We can do a look up for the corresponding function
 We can then run the function
 Then write whatever response to the TCP connection available
+
+UPDATE: 
+So the connection is now closed after serving the required resource
+This can be modified in the future, for now this is fine.
+
+The router will sit on top of the handle_function.
+We have to read the path before fetching the corresponding function
+Then we send off the computation to run in a seperate thread and write the data back
+whatever way required since the TCP Connection will be available in the
+seperate thread.
 */
 
 use std::net::TcpStream;

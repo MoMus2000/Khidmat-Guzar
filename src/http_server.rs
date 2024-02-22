@@ -52,6 +52,7 @@ impl Server for HttpServer{
     }
 
     // Implementation of HTTP -> this is what will differ in comparision to TCP;
+    // Closing the http connection after serving the required resource
     fn handle_connection(stream_data: TcpStream, _ : Arc<Mutex<Vec<TcpStream>>>){
         let mut stream_data = stream_data.try_clone().unwrap();
         // let buffer  = "Connected .. Send some data over. \n".as_bytes();
@@ -67,6 +68,7 @@ impl Server for HttpServer{
                             println!("{}", msg);
                             let stream_data_copied= stream_data.try_clone();
                             HttpServer::write_http_status(stream_data_copied.unwrap());
+                            break
                         },
                         Err(e)=>{
                             eprintln!("Something went wrong: {}", e);
