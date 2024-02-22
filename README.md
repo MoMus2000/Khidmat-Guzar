@@ -1,18 +1,18 @@
-## خدمت گزار (HTTP Server From Scratch Implementation)
+## HTTP Server From Scratch Implementation: خدمت گزار 
 
 ## Features
 
-### راستہ نمائی (Routing)
+### Routing: راستہ نمائی
 
 ```bash
 ```
 
-### نمونہ بندی (Templating)
+### Templating: نمونہ بندی
 
 ```bash
 ```
 
-### ثابت فائلوں کی فراہمی (Serve Static files)
+### Serve Static files: ثابت فائلوں کی فراہمی
 
 ```bash
 ```
