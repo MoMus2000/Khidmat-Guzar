@@ -9,7 +9,7 @@ pub struct HttpContent{
 pub struct HtmlNode {
     pub tag_name: String,
     pub tag_id : String,
-    pub tag_value: String
+    pub tag_value: String,
 }
 
 impl HtmlNode{

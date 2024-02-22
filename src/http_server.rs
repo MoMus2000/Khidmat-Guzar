@@ -5,13 +5,15 @@ use std::io::{Write, Read};
 use std::str;
 
 use crate::http::http_builder::{HttpContent, HtmlNode};
+use crate::http::router::Router;
 use crate::server::Server;
-use crate::http::{self, http_builder};
+use crate::http::{self, router};
 
 pub struct HttpServer{
     address: String,
     port: String,
-    listener: Option<TcpListener>
+    listener: Option<TcpListener>,
+    router: Option<router::Router>
 }
 
 const BUFFER_SIZE : usize = 8096;
@@ -86,7 +88,27 @@ impl HttpServer{
         HttpServer{
             address,
             port,
-            listener: None
+            listener: None,
+            router: Router::new()
+        }
+    }
+
+    fn some_function(method: &str) -> bool{
+        println!("Running this function");
+        false
+    }
+
+    fn attach_path_to_router(&mut self){
+        let r_elem = router::RouterElement{
+            path: "/mustafa",
+            callback_function: HttpServer::some_function
+        };
+
+        match &mut self.router{
+            Some(router) => {
+                router.router_elem.push(r_elem);
+            }
+            _ => {}
         }
     }
 
