@@ -31,6 +31,8 @@ impl Server for HttpServer{
             panic!("{}",err);
            }
         }
+        self.attach_path_to_router();
+        (self.router.as_ref().expect("something").router_elem[0].callback_function)("GET");
 
         for stream in self.listener.as_mut().unwrap().incoming(){
             match stream{
@@ -94,7 +96,7 @@ impl HttpServer{
     }
 
     fn some_function(method: &str) -> bool{
-        println!("Running this function");
+        println!("Running this function with the method {}", method);
         false
     }
 
