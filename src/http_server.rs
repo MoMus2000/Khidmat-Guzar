@@ -32,14 +32,14 @@ impl Server for HttpServer{
            }
         }
         self.attach_path_to_router();
-        (self.router.as_ref().expect("something").router_elem[0].callback_function)("GET");
 
         for stream in self.listener.as_mut().unwrap().incoming(){
             match stream{
                 Ok(stream) => {
+                    let cloned_router = self.router.clone();
                     let moved_shared_data = Arc::clone(&shared_data);
                     thread::spawn(move || {
-                        HttpServer::handle_connection(stream, moved_shared_data);
+                        HttpServer::handle_connection(stream, moved_shared_data, cloned_router);
                     });
                 }
                 Err(err) => {
@@ -53,7 +53,7 @@ impl Server for HttpServer{
 
     // Implementation of HTTP -> this is what will differ in comparision to TCP;
     // Closing the http connection after serving the required resource
-    fn handle_connection(stream_data: TcpStream, _ : Arc<Mutex<Vec<TcpStream>>>){
+    fn handle_connection(stream_data: TcpStream, _ : Arc<Mutex<Vec<TcpStream>>>, router: Option<Router>){
         let mut stream_data = stream_data.try_clone().unwrap();
         // let buffer  = "Connected .. Send some data over. \n".as_bytes();
         // // stream_data.write_all(buffer).expect("Should have sent the data");
@@ -66,6 +66,12 @@ impl Server for HttpServer{
                         Ok(msg) => {
                             println!("Got msg:");
                             println!("{}", msg);
+
+                            // Path matching would happen here
+                            let function_to_run = router.as_ref().expect("").fetch_function_based_on_path("/mustafa");
+                            (function_to_run.expect("").callback_function)("POST");
+                            (router.as_ref().expect("something").router_elem[0].callback_function)("GET");
+
                             let stream_data_copied= stream_data.try_clone();
                             HttpServer::write_http_status(stream_data_copied.unwrap());
                             break

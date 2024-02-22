@@ -28,6 +28,7 @@ seperate thread.
 
 use std::net::TcpStream;
 
+#[derive(Clone)]
 pub struct Router{
     pub router_elem: Vec::<RouterElement>
 }
@@ -38,8 +39,18 @@ impl Router {
             router_elem: Vec::<RouterElement>::new()
         })
     }
+
+    pub fn fetch_function_based_on_path(&self, principal_path: &str) -> Option<RouterElement>{
+        for element in &self.router_elem{
+            if element.path == principal_path{
+                return Some(element.clone())
+            }
+        }
+        None
+    }
 }
 
+#[derive(Clone)]
 pub struct RouterElement {
     pub path: &'static str,
     pub callback_function: fn(method: &str) -> bool
