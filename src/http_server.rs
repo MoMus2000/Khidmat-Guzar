@@ -4,8 +4,9 @@ use std::thread;
 use std::io::{Write, Read};
 use std::str;
 
+use crate::http::http_builder::{HttpContent, HtmlNode};
 use crate::server::Server;
-use crate::http::http_builder;
+use crate::http::{self, http_builder};
 
 pub struct HttpServer{
     address: String,
@@ -28,6 +29,7 @@ impl Server for HttpServer{
             panic!("{}",err);
            }
         }
+
         for stream in self.listener.as_mut().unwrap().incoming(){
             match stream{
                 Ok(stream) => {
@@ -42,6 +44,7 @@ impl Server for HttpServer{
                 }
             }
         }
+
     }
 
     // Implementation of HTTP -> this is what will differ in comparision to TCP;
@@ -93,15 +96,16 @@ impl HttpServer{
         let header_1 = b"Server: Crude Server\r\n";
         let header_2 = b"Content-type: text/html\r\n";
         let blank_line = b"\r\n";
-        let html = b"
-        <html>
-            <head></head>
-            <body><h1>Hey This is my first http server</h1></body>
-       </html>\r\n
-        ";
+        let mut html = HttpContent::new();
+
+        let h1_node = http::http_builder::HtmlNode::new_with_str("h1", "" , "Some Random Text");
+
+        html.add_html_node(h1_node.clone());
+
+        html.generate_boilerplate();
 
         // Calculate the length of the HTML content
-        let content_length = html.len().to_string();
+        let content_length = html.body.len().to_string();
         let content_length_header = format!("Content-Length: {}\r\n", content_length);
 
         let response: Vec<u8> = [
@@ -111,7 +115,7 @@ impl HttpServer{
             header_2.into_iter(),
             content_length_header.as_bytes().into_iter(),
             blank_line.into_iter(),
-            html.into_iter(),
+            html.convert_to_bytes().into_iter(),
 
         ]
         .into_iter()
@@ -127,4 +131,5 @@ impl HttpServer{
         println!("Got request .. Sending response");
         println!("{:?}", str::from_utf8(&response));
     }
+
 }
