@@ -4,6 +4,15 @@
 
 ### راستہ نمائی (Routing)
 
+```bash
+```
+
 ### نمونہ بندی (Templating)
 
+```bash
+```
+
 ### ثابت فائلوں کی فراہمی (Serve Static files)
+
+```bash
+```
