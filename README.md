@@ -2,17 +2,22 @@
 
 ## Features
 
-### Routing: راستہ نمائی
+### Initialization: آغاز
 
-```bash
+```rust
+let http_server = http_server::HTTPServer::new();
+http_server.start_server();
 ```
 
-### Templating: نمونہ بندی
+### Routing: راستہ نمائی
 
-```bash
+```rust
+let router = http::router::new();
+http_server.attach_router(router);
 ```
 
 ### Serve Static files: ثابت فائلوں کی فراہمی
 
-```bash
+```rust
+http_server.serve_static_file("/file/index.html");
 ```
