@@ -4,13 +4,15 @@
 // . Explore Command pattern from zozin
 // . Explore HTTP Protocol and work towards implementation
 use crate::server::{HTTP_Server, Server};
+use std::net::TcpStream;
+use crate::http::http_request;
 
 mod server;
 mod tcp;
 mod http_server;
 mod http;
 
-fn print_hello_world(){
+fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
     println!("Hello world !")
 }
 
@@ -19,6 +21,7 @@ fn main() {
 
     let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
+    router.add_route("/", "GET", print_hello_world);
     router.add_route("/mustafa", "GET", print_hello_world);
     router.add_route("/mustafa1", "POST", print_hello_world);
     router.add_route("/mustafa2", "PUT", print_hello_world);

@@ -68,11 +68,14 @@ impl HTTP_Server for HttpServer{
                             let parsed_request = HttpRequest::parse_request(msg);
 
                             // Path matching would happen here
-                            let function_to_run = router.as_ref().expect("").fetch_function_based_on_path("/mustafa");
-                            (function_to_run.expect("").callback_function)();
-                            (router.as_ref().expect("something").router_elem[0].callback_function)();
+                            let function_to_run = router.as_ref().expect("")
+                                .fetch_function_based_on_path(&parsed_request.path);
+
+                            (function_to_run.expect("Error: Could not fetch the function")
+                                .callback_function)(stream_data.try_clone().unwrap(), parsed_request);
 
                             let stream_data_copied= stream_data.try_clone();
+
                             HttpServer::write_http_status(stream_data_copied.unwrap());
                             break
                         },

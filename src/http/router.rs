@@ -26,6 +26,10 @@ whatever way required since the TCP Connection will be available in the
 seperate thread.
 */
 
+use std::net::TcpStream;
+
+use super::http_request;
+
 
 #[derive(Clone)]
 pub struct Router{
@@ -40,15 +44,17 @@ impl Router {
     }
 
     pub fn fetch_function_based_on_path(&self, principal_path: &str) -> Option<RouterElement>{
+        println!("The principal path {principal_path}");
         for element in &self.router_elem{
-            if element.path == principal_path{
+            println!("The element path {} == {} {}", element.path, principal_path, element.path == principal_path);
+            if element.path.trim() == principal_path.trim(){
                 return Some(element.clone())
             }
         }
         None
     }
 
-    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn()){
+    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn(response_writer : TcpStream, request : http_request::HttpRequest)){
 
         let element = RouterElement{
             path,
@@ -82,9 +88,9 @@ impl Router {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RouterElement {
     pub path: &'static str,
-    pub callback_function: fn(),
+    pub callback_function: fn(response_writer : TcpStream, request : http_request::HttpRequest),
     pub method: &'static str
 }

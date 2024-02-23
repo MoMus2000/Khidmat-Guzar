@@ -47,8 +47,10 @@ mod tests {
     use crate::http;
     use crate::server::HTTP_Server;
     use std::thread;
+    use std::net::TcpStream;
+    use crate::http::http_request;
 
-    fn print_hello_world(){
+    fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
         println!("Hello World")
     }
 
