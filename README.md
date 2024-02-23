@@ -1,4 +1,6 @@
-## خدمت گزار 
+## Http Server خدمت گزار 
+
+A http/1.1 implementation from scratch.
 
 ## Features
 
