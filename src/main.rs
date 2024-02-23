@@ -3,17 +3,19 @@
 // . Explore ncurses or alternatives for a tui
 // . Explore Command pattern from zozin
 // . Explore HTTP Protocol and work towards implementation
-use crate::server::{HTTP_Server, Server};
+
+use crate::server::HTTP_Server;
 use std::net::TcpStream;
 use crate::http::http_request;
+use crate::http::http_builder::write_http_status;
 
 mod server;
-mod tcp;
 mod http_server;
 mod http;
 
 fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
-    println!("Hello world !")
+    println!("The called operation is {}", request.method);
+    write_http_status(response_writer, 200);
 }
 
 fn main() {
@@ -22,10 +24,6 @@ fn main() {
     let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
     router.add_route("/", "GET", print_hello_world);
-    router.add_route("/mustafa", "GET", print_hello_world);
-    router.add_route("/mustafa1", "POST", print_hello_world);
-    router.add_route("/mustafa2", "PUT", print_hello_world);
-    router.add_route("/mustafa3", "DELETE", print_hello_world);
 
     http_server.attach_router(router);
 

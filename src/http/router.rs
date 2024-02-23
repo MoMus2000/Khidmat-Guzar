@@ -64,19 +64,15 @@ impl Router {
 
         match method {
             "GET" => {
-                println!("GET method called");
                 self.router_elem.push(element);
             }
             "POST" => {
-                println!("POST method called");
                 self.router_elem.push(element);
             }
             "PUT" => {
-                println!("PUT method called");
                 self.router_elem.push(element);
             }
             "DELETE" => {
-                println!("DELETE method called");
                 self.router_elem.push(element);
             }
             "" => {

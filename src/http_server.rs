@@ -74,9 +74,6 @@ impl HTTP_Server for HttpServer{
                             (function_to_run.expect("Error: Could not fetch the function")
                                 .callback_function)(stream_data.try_clone().unwrap(), parsed_request);
 
-                            let stream_data_copied= stream_data.try_clone();
-
-                            HttpServer::write_http_status(stream_data_copied.unwrap());
                             break
                         },
                         Err(e)=>{
@@ -110,46 +107,5 @@ impl HttpServer{
         self.router = Some(router);
     }
 
-    fn write_http_status(mut stream: TcpStream){
-
-        let response_line = b"HTTP/1.1 200 OK\r\n";
-        let header_1 = b"Server: Crude Server\r\n";
-        let header_2 = b"Content-type: text/html\r\n";
-        let blank_line = b"\r\n";
-        let mut html = HttpContent::new();
-
-        let h1_node = http::http_builder::HtmlNode::new_with_str("h1", "" , "Some Random Text");
-
-        html.add_html_node(h1_node.clone());
-
-        html.generate_boilerplate();
-
-        // Calculate the length of the HTML content
-        let content_length = html.body.len().to_string();
-        let content_length_header = format!("Content-Length: {}\r\n", content_length);
-
-        let response: Vec<u8> = [
-
-            response_line.iter(),
-            header_1.iter(),
-            header_2.into_iter(),
-            content_length_header.as_bytes().into_iter(),
-            blank_line.into_iter(),
-            html.convert_to_bytes().into_iter(),
-
-        ]
-        .into_iter()
-        .flatten()
-        .cloned()
-        .collect();
-
-        match stream.write_all(&response){
-            Ok(_)=>{},
-            Err(e)=>{println!("Something went wrong writing: {}",e)}
-        };
-
-        println!("Got request .. Sending response");
-        println!("{:?}", str::from_utf8(&response));
-    }
 
 }
