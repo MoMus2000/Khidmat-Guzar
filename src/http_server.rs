@@ -31,7 +31,6 @@ impl Server for HttpServer{
             panic!("{}",err);
            }
         }
-        self.attach_path_to_router();
 
         for stream in self.listener.as_mut().unwrap().incoming(){
             match stream{
@@ -69,8 +68,8 @@ impl Server for HttpServer{
 
                             // Path matching would happen here
                             let function_to_run = router.as_ref().expect("").fetch_function_based_on_path("/mustafa");
-                            (function_to_run.expect("").callback_function)("POST");
-                            (router.as_ref().expect("something").router_elem[0].callback_function)("GET");
+                            (function_to_run.expect("").callback_function)();
+                            (router.as_ref().expect("something").router_elem[0].callback_function)();
 
                             let stream_data_copied= stream_data.try_clone();
                             HttpServer::write_http_status(stream_data_copied.unwrap());
@@ -99,27 +98,12 @@ impl HttpServer{
             address,
             port,
             listener: None,
-            router: Router::new()
+            router: None
         }
     }
 
-    fn some_function(method: &str) -> bool{
-        println!("Running this function with the method {}", method);
-        false
-    }
-
-    fn attach_path_to_router(&mut self){
-        let r_elem = router::RouterElement{
-            path: "/mustafa",
-            callback_function: HttpServer::some_function
-        };
-
-        match &mut self.router{
-            Some(router) => {
-                router.router_elem.push(r_elem);
-            }
-            _ => {}
-        }
+    pub fn attach_router(&mut self, router: Router){
+        self.router = Some(router);
     }
 
     fn write_http_status(mut stream: TcpStream){

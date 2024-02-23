@@ -26,7 +26,6 @@ whatever way required since the TCP Connection will be available in the
 seperate thread.
 */
 
-use std::net::TcpStream;
 
 #[derive(Clone)]
 pub struct Router{
@@ -48,10 +47,44 @@ impl Router {
         }
         None
     }
+
+    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn()){
+
+        let element = RouterElement{
+            path,
+            callback_function,
+            method
+        };
+
+        match method {
+            "GET" => {
+                println!("GET method called");
+                self.router_elem.push(element);
+            }
+            "POST" => {
+                println!("POST method called");
+                self.router_elem.push(element);
+            }
+            "PUT" => {
+                println!("PUT method called");
+                self.router_elem.push(element);
+            }
+            "DELETE" => {
+                println!("DELETE method called");
+                self.router_elem.push(element);
+            }
+            "" => {
+                panic!("Method cannot be empty or undefined !");
+            }
+            _ => {panic!("Method not found either [GET, POST, PUT, DELETE]")}
+        }
+    }
+
 }
 
 #[derive(Clone)]
 pub struct RouterElement {
     pub path: &'static str,
-    pub callback_function: fn(method: &str) -> bool
+    pub callback_function: fn(),
+    pub method: &'static str
 }
