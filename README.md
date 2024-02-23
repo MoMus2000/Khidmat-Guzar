@@ -14,9 +14,15 @@ http_server.start_server();
 ### Routing: راستہ نمائی
 
 ```rust
+
+fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
+    println!("Hello world !")
+}
+
 let router = http::router::new();
-router.add_route("/", "GET", func_to_run);
+router.add_route("/", "GET", print_hello_world);
 http_server.attach_router(router);
+
 ```
 
 ### Serve Static files: ثابت فائلوں کی فراہمی
