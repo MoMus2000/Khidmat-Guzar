@@ -15,6 +15,7 @@ http_server.start_server();
 
 ```rust
 let router = http::router::new();
+router.add_route("/", "GET", func_to_run);
 http_server.attach_router(router);
 ```
 
