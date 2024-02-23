@@ -6,8 +6,9 @@ use std::str;
 
 use crate::http::http_builder::{HttpContent, HtmlNode};
 use crate::http::router::Router;
-use crate::server::Server;
+use crate::server::{HTTP_Server, Server};
 use crate::http::{self, router};
+use crate::http::http_request::HttpRequest;
 
 pub struct HttpServer{
     address: String,
@@ -18,9 +19,8 @@ pub struct HttpServer{
 
 const BUFFER_SIZE : usize = 8096;
 
-impl Server for HttpServer{
+impl HTTP_Server for HttpServer{
     fn start_server(&mut self){
-        let shared_data = Arc::new(Mutex::new(Vec::<TcpStream>::new()));
         let ip_address = format!("{}:{}",self.address, self.port);
         match TcpListener::bind(&ip_address){
            Ok(listener) => {
@@ -36,9 +36,8 @@ impl Server for HttpServer{
             match stream{
                 Ok(stream) => {
                     let cloned_router = self.router.clone();
-                    let moved_shared_data = Arc::clone(&shared_data);
                     thread::spawn(move || {
-                        HttpServer::handle_connection(stream, moved_shared_data, cloned_router);
+                        HttpServer::handle_connection(stream, cloned_router);
                     });
                 }
                 Err(err) => {
@@ -52,7 +51,7 @@ impl Server for HttpServer{
 
     // Implementation of HTTP -> this is what will differ in comparision to TCP;
     // Closing the http connection after serving the required resource
-    fn handle_connection(stream_data: TcpStream, _ : Arc<Mutex<Vec<TcpStream>>>, router: Option<Router>){
+    fn handle_connection(stream_data: TcpStream, router: Option<Router>){
         let mut stream_data = stream_data.try_clone().unwrap();
         // let buffer  = "Connected .. Send some data over. \n".as_bytes();
         // // stream_data.write_all(buffer).expect("Should have sent the data");
@@ -65,6 +64,8 @@ impl Server for HttpServer{
                         Ok(msg) => {
                             println!("Got msg:");
                             println!("{}", msg);
+
+                            let parsed_request = HttpRequest::parse_request(msg);
 
                             // Path matching would happen here
                             let function_to_run = router.as_ref().expect("").fetch_function_based_on_path("/mustafa");

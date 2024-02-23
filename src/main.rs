@@ -3,7 +3,7 @@
 // . Explore ncurses or alternatives for a tui
 // . Explore Command pattern from zozin
 // . Explore HTTP Protocol and work towards implementation
-use crate::server::Server;
+use crate::server::{HTTP_Server, Server};
 
 mod server;
 mod tcp;
