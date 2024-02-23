@@ -1,4 +1,4 @@
-## HTTP Server From Scratch Implementation: خدمت گزار 
+## خدمت گزار 
 
 ## Features
 
