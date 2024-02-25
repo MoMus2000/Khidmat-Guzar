@@ -13,7 +13,7 @@ mod server;
 mod http_server;
 mod http;
 
-fn print_hello_world(response_writer : &ResponseWriter, request : http_request::HttpRequest){
+fn print_hello_world(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
     println!("The called operation is {}", request.method);
     write_http_status(&response_writer);
 }

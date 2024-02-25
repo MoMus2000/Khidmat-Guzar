@@ -88,32 +88,17 @@ impl HttpContent{
 pub fn write_http_status(response_writer : &ResponseWriter){
     let statuscode = response_writer.status_code;
     let mut stream = &response_writer.stream;
-    let mut response_line = "";
-    println!("THE HTTP STATUS CODE {}", statuscode);
-    if statuscode == 200{
-        response_line = "HTTP/1.1 200 OK\r\n";
-    }
-    else if statuscode == 404{
-        response_line = "HTTP/1.1 404 Not Found\r\n";
-    }
-    else{
-        response_line = "HTTP/1.1 500 Internal Server Error\r\n";
-    } 
+
+    let response_line = if statuscode == 200 || statuscode == 201 {
+        String::from(format!("HTTP/1.1 {} OK\r\n", statuscode))
+    } else if statuscode == 404 {
+        String::from("HTTP/1.1 404 Not Found\r\n")
+    } else {
+        String::from("HTTP/1.1 500 Internal Server Error\r\n")
+    };
 
     let header_1 = b"Server: Crude Server\r\n";
-    let header_2 = b"Content-type: text/html\r\n";
     let blank_line = b"\r\n";
-    let mut html = HttpContent::new();
-
-    let h1_node = http::http_builder::HtmlNode::new_with_str("h1", "" , "Some Random Text");
-
-    html.add_html_node(h1_node.clone());
-
-    // html.generate_boilerplate();
-
-    // Calculate the length of the HTML content
-    let content_length = html.body.len().to_string();
-    let content_length_header = format!("Content-Length: {}\r\n", content_length);
 
     let response: Vec<u8> = [
 

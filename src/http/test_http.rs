@@ -4,12 +4,21 @@ mod tests {
     use crate::http_server;
     use crate::http;
     use crate::server::HTTP_Server;
+    use std::borrow::BorrowMut;
     use std::thread;
     use std::io::{Write, Read};
     use crate::http::http_request;
+    use std::sync::{Arc, Mutex};
 
-    fn print_hello_world(_response_writer : &ResponseWriter, _request : http_request::HttpRequest){
+    fn print_hello_world(_response_writer : &mut ResponseWriter, _request : http_request::HttpRequest){
         println!("Hello World! ");
+    }
+
+    fn set_http_status_201(response_writer : &mut ResponseWriter, _request : http_request::HttpRequest){
+        println!("Hello World! ");
+        response_writer.write_status_code(201);
+        http::http_builder::write_http_status(response_writer);
+        println!("Wrote the status code")
     }
 
     #[test]
@@ -58,18 +67,21 @@ mod tests {
 
     #[test]
     fn test_router_not_found() {
-        let mut http_server = http_server::HttpServer::new("localhost".to_string(), "6969".to_string());
+        let http_server = Arc::new(Mutex::new(http_server::HttpServer::new("localhost".to_string(), "6969".to_string())));
 
         let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
         router.add_route("/", "GET", print_hello_world);
 
-        http_server.attach_router(router);
+        http_server.lock().unwrap().attach_router(router);
+
+        let server_thread = Arc::clone(&http_server);
 
         thread::spawn(move || {
             let result = std::panic::catch_unwind(move || {
                 println!("Spawning the webserver");
-                http_server.start_server();
+                server_thread.lock().unwrap().start_server();
+                println!("Closing the server");
             });
         
             if let Err(err) = result {
@@ -78,11 +90,13 @@ mod tests {
 
         });
 
+        http_server.lock().unwrap().close();
+
         let resp = reqwest::blocking::get("http://localhost:6969/some_random_path");
 
         let resp = resp.expect("Oh no something went wrong !");
 
-        assert!(resp.status().is_client_error(), "Expected 404 but got {}", resp.status())
+        assert!(resp.status().is_client_error(), "Expected 404 but got {}", resp.status());
 
     }
 
@@ -96,6 +110,38 @@ mod tests {
 
         http_server.attach_router(router);
 
+        let server_thread = thread::spawn({
+            move || {
+                let result = std::panic::catch_unwind(move || {
+                    println!("Spawning the webserver");
+                        // Your web server logic here
+                        http_server.start_server();
+                });
+    
+                if let Err(err) = result {
+                    eprintln!("Thread panicked: {:?}", err);
+                }
+            }
+        }); 
+
+        let resp = reqwest::blocking::get("http://localhost:6969/some_random_path");
+
+        let resp = resp.expect("Oh no something went wrong !");
+
+        assert!(resp.status().is_client_error(), "Expected 404 but got {}", resp.status());
+
+    }
+
+    #[test]
+    fn test_setting_http_status(){
+        let mut http_server = http_server::HttpServer::new("localhost".to_string(), "6969".to_string());
+
+        let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
+
+        router.add_route("/", "GET", set_http_status_201);
+
+        http_server.attach_router(router);
+
         thread::spawn(move || {
             let result = std::panic::catch_unwind(move || {
                 println!("Spawning the webserver");
@@ -108,11 +154,13 @@ mod tests {
 
         });
 
-        let resp = reqwest::blocking::get("http://localhost:6969/some_random_path");
+        println!("Sending the request");
+
+        let resp = reqwest::blocking::get("http://localhost:6969/");
 
         let resp = resp.expect("Oh no something went wrong !");
 
-        assert!(resp.status().is_client_error(), "Expected 404 but got {}", resp.status())
+        assert!(resp.status().as_u16() == 201, "Expected 201 but got {}", resp.status())
 
     }
 

@@ -51,7 +51,7 @@ impl Router {
         None
     }
 
-    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn(response_writer : &ResponseWriter, request : http_request::HttpRequest)){
+    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn(response_writer : &mut ResponseWriter, request : http_request::HttpRequest)){
 
         let element = RouterElement{
             path,
@@ -84,6 +84,6 @@ impl Router {
 #[derive(Clone, Debug)]
 pub struct RouterElement {
     pub path: &'static str,
-    pub callback_function: fn(response_writer : &ResponseWriter, request : http_request::HttpRequest),
+    pub callback_function: fn(response_writer : &mut ResponseWriter, request : http_request::HttpRequest),
     pub method: &'static str
 }
