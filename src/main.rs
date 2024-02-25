@@ -5,7 +5,6 @@
 // . Explore HTTP Protocol and work towards implementation
 
 use crate::server::HTTP_Server;
-use std::net::TcpStream;
 use crate::http::http_request;
 use crate::http::http_builder::write_http_status;
 use crate::http::response_writer::ResponseWriter;

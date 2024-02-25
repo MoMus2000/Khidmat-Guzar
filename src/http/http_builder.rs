@@ -1,7 +1,5 @@
-use std::os::macos::raw::stat;
 use std::str;
 use crate::http;
-use std::net::TcpStream;
 use std::io::Write;
 
 use super::response_writer::ResponseWriter;

@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::default;
 use std::net::TcpStream;
 
 pub struct ResponseWriter{

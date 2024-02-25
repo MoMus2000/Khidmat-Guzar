@@ -3,7 +3,7 @@ use std::thread;
 use std::io::Read;
 use std::str;
 
-use crate::http::response_writer::{self, ResponseWriter};
+use crate::http::response_writer::ResponseWriter;
 use crate::http::router::Router;
 use crate::server::HTTP_Server;
 use crate::http::{self, router};

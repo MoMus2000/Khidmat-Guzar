@@ -26,7 +26,6 @@ whatever way required since the TCP Connection will be available in the
 seperate thread.
 */
 
-use std::net::TcpStream;
 
 use super::{http_request, response_writer::ResponseWriter};
 
