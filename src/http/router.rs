@@ -28,7 +28,7 @@ seperate thread.
 
 use std::net::TcpStream;
 
-use super::http_request;
+use super::{http_request, response_writer::ResponseWriter};
 
 
 #[derive(Clone)]
@@ -54,7 +54,7 @@ impl Router {
         None
     }
 
-    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn(response_writer : TcpStream, request : http_request::HttpRequest)){
+    pub fn add_route(&mut self, path: &'static str, method: &'static str, callback_function: fn(response_writer : &ResponseWriter, request : http_request::HttpRequest)){
 
         let element = RouterElement{
             path,
@@ -87,6 +87,6 @@ impl Router {
 #[derive(Clone, Debug)]
 pub struct RouterElement {
     pub path: &'static str,
-    pub callback_function: fn(response_writer : TcpStream, request : http_request::HttpRequest),
+    pub callback_function: fn(response_writer : &ResponseWriter, request : http_request::HttpRequest),
     pub method: &'static str
 }

@@ -1,12 +1,11 @@
 use std::net::{TcpListener, TcpStream};
-use std::sync::{Arc, Mutex};
 use std::thread;
-use std::io::{Write, Read};
+use std::io::Read;
 use std::str;
 
-use crate::http::http_builder::{HttpContent, HtmlNode};
+use crate::http::response_writer::{self, ResponseWriter};
 use crate::http::router::Router;
-use crate::server::{HTTP_Server, Server};
+use crate::server::HTTP_Server;
 use crate::http::{self, router};
 use crate::http::http_request::HttpRequest;
 
@@ -62,8 +61,6 @@ impl HTTP_Server for HttpServer{
                     let string_result = str::from_utf8(&buffer[0..len]);
                     match string_result {
                         Ok(msg) => {
-                            println!("Got msg:");
-                            println!("{}", msg);
 
                             let parsed_request = HttpRequest::parse_request(msg);
 
@@ -71,8 +68,22 @@ impl HTTP_Server for HttpServer{
                             let function_to_run = router.as_ref().expect("")
                                 .fetch_function_based_on_path(&parsed_request.path);
 
-                            (function_to_run.expect("Error: Could not fetch the function")
-                                .callback_function)(stream_data.try_clone().unwrap(), parsed_request);
+                            match function_to_run{
+                                Some(fetched_func) => {
+                                    println!("Found the function to fetch");
+                                    let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
+                                    rw.write_status_code(200);
+                                    http::http_builder::write_http_status(&rw);
+                                    (fetched_func.callback_function)(&rw,
+                                    parsed_request);
+                                }
+                                None => {
+                                    println!("Unable to fetch the function");
+                                    let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
+                                    rw.write_status_code(404);
+                                    http::http_builder::write_http_status(&rw);
+                                }
+                            }
 
                             break
                         },
@@ -82,6 +93,7 @@ impl HTTP_Server for HttpServer{
                         }
                     }
                 },
+
                 Err(e)=>{
                     eprintln!("Something went wrong reading data from the server ...");
                     eprint!("{}", e);
@@ -106,6 +118,4 @@ impl HttpServer{
     pub fn attach_router(&mut self, router: Router){
         self.router = Some(router);
     }
-
-
 }

@@ -8,14 +8,15 @@ use crate::server::HTTP_Server;
 use std::net::TcpStream;
 use crate::http::http_request;
 use crate::http::http_builder::write_http_status;
+use crate::http::response_writer::ResponseWriter;
 
 mod server;
 mod http_server;
 mod http;
 
-fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
+fn print_hello_world(response_writer : &ResponseWriter, request : http_request::HttpRequest){
     println!("The called operation is {}", request.method);
-    write_http_status(response_writer, 200);
+    write_http_status(&response_writer);
 }
 
 fn main() {

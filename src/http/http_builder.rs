@@ -1,7 +1,10 @@
-use std::{fmt::format, string, str};
+use std::os::macos::raw::stat;
+use std::str;
 use crate::http;
 use std::net::TcpStream;
 use std::io::Write;
+
+use super::response_writer::ResponseWriter;
 
 pub struct HttpContent{
     pub body: String,
@@ -28,7 +31,7 @@ impl HtmlNode{
     fn to_string(&self) -> String{
         let empty_id = String::from("");
         match &self.tag_id{
-            empty_string => {
+            _empty_string => {
                 format!("<{} id=\"\">{}</{}>", self.tag_name, self.tag_value, self.tag_name)
             }
             _ => {
@@ -84,8 +87,11 @@ impl HttpContent{
 
 }
 
-pub fn write_http_status(mut stream: TcpStream, statuscode: i32){
-    let mut response_line = "\r\n";
+pub fn write_http_status(response_writer : &ResponseWriter){
+    let statuscode = response_writer.status_code;
+    let mut stream = &response_writer.stream;
+    let mut response_line = "";
+    println!("THE HTTP STATUS CODE {}", statuscode);
     if statuscode == 200{
         response_line = "HTTP/1.1 200 OK\r\n";
     }
@@ -105,7 +111,7 @@ pub fn write_http_status(mut stream: TcpStream, statuscode: i32){
 
     html.add_html_node(h1_node.clone());
 
-    html.generate_boilerplate();
+    // html.generate_boilerplate();
 
     // Calculate the length of the HTML content
     let content_length = html.body.len().to_string();
@@ -115,11 +121,7 @@ pub fn write_http_status(mut stream: TcpStream, statuscode: i32){
 
         response_line.as_bytes().iter(),
         header_1.iter(),
-        header_2.into_iter(),
-        content_length_header.as_bytes().into_iter(),
         blank_line.into_iter(),
-        html.convert_to_bytes().into_iter(),
-
     ]
     .into_iter()
     .flatten()
@@ -131,6 +133,4 @@ pub fn write_http_status(mut stream: TcpStream, statuscode: i32){
         Err(e)=>{println!("Something went wrong writing: {}",e)}
     };
 
-    println!("Got request .. Sending response");
-    println!("{:?}", str::from_utf8(&response));
 }
