@@ -1,3 +1,4 @@
+use core::panic;
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 use std::io::Read;
@@ -61,16 +62,30 @@ impl HTTP_Server for HttpServer{
                     let string_result = str::from_utf8(&buffer[0..len]);
                     match string_result {
                         Ok(msg) => {
-
-                            let parsed_request = HttpRequest::parse_request(msg);
+                            let parsed_request = match HttpRequest::parse_request(msg) {
+                                Ok(request) => request,
+                                Err(error) => {
+                                    let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
+                                    rw.write_status_code(500);
+                                    http::http_builder::write_http_status(&rw);
+                                    eprintln!("Error parsing request: {}", error);
+                                    panic!("Path NOT Found");
+                                }
+                            };
 
                             // Path matching would happen here
-                            let function_to_run = router.as_ref().expect("")
-                                .fetch_function_based_on_path(&parsed_request.path);
+                            let function_to_run = router.as_ref().unwrap_or_else(|| {
+                                // Handle the None case here, e.g., return a default function or panic with a specific message.
+
+                                    let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
+                                    rw.write_status_code(500);
+                                    http::http_builder::write_http_status(&rw);
+                                    panic!("Internal erorr please check");
+
+                            }).fetch_function_based_on_path(&parsed_request.path);
 
                             match function_to_run{
                                 Some(fetched_func) => {
-                                    println!("Found the function to fetch");
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(200);
                                     http::http_builder::write_http_status(&rw);
@@ -78,7 +93,6 @@ impl HTTP_Server for HttpServer{
                                     parsed_request);
                                 }
                                 None => {
-                                    println!("Unable to fetch the function");
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(404);
                                     http::http_builder::write_http_status(&rw);

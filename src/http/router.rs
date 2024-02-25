@@ -43,9 +43,7 @@ impl Router {
     }
 
     pub fn fetch_function_based_on_path(&self, principal_path: &str) -> Option<RouterElement>{
-        println!("The principal path {principal_path}");
         for element in &self.router_elem{
-            println!("The element path {} == {} {}", element.path, principal_path, element.path == principal_path);
             if element.path.trim() == principal_path.trim(){
                 return Some(element.clone())
             }
