@@ -15,7 +15,7 @@ http_server.start_server();
 
 ```rust
 
-fn print_hello_world(response_writer : TcpStream, request : http_request::HttpRequest){
+fn print_hello_world(response_writer : &RequestWriter, request : http_request::HttpRequest){
     println!("Hello world !")
 }
 
@@ -28,5 +28,5 @@ http_server.attach_router(router);
 ### Serve Static files: ثابت فائلوں کی فراہمی
 
 ```rust
-http_server.serve_static_file("/file/index.html");
+http_server.serve_static_file("/", "/file/index.html");
 ```
