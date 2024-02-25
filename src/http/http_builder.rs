@@ -1,8 +1,7 @@
-use std::borrow::Borrow;
 use std::io::Write;
 
 use super::response_writer::ResponseWriter;
-use crate::http::http_headers::{self, HttpHeaders};
+use crate::http::http_headers::HttpHeaders;
 use crate::http;
 
 pub fn build_http_payload(status_code : i32, content: Option<http::http_content::http_content>) -> String {

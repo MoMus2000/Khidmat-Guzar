@@ -6,9 +6,7 @@ mod tests {
     use crate::server::HTTP_Server;
     use std::thread;
     use std::io::{Write, Read};
-    use std::time::Duration;
     use crate::http::http_request;
-    use std::sync::{Arc, Mutex};
 
     fn print_hello_world(_response_writer : &mut ResponseWriter, _request : http_request::HttpRequest){
         println!("Hello World! ");
