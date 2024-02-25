@@ -28,5 +28,13 @@ http_server.attach_router(router);
 ### Serve Static files: ثابت فائلوں کی فراہمی
 
 ```rust
-http_server.serve_static_file("/", "/file/index.html");
+fn serve_html_file(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
+    let content = http_content::serve_static_file(response_writer, request, 
+        "./assets/index.html".to_string(), "text/html".to_string());
+    response_writer.write_status_code(200);
+    let headers = http::http_builder::build_http_payload(200, Some(content));
+    write_http_response(&response_writer, Some(headers));
+}
+
+router.add_route("/file", "GET", serve_html_file);
 ```

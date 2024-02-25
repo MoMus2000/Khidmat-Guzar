@@ -3,7 +3,7 @@ use std::io::Write;
 use super::response_writer::ResponseWriter;
 use crate::http::http_headers::{self, HttpHeaders};
 
-pub fn build_http_headers(status_code : i32, content: Option<String>) -> String {
+pub fn build_http_payload(status_code : i32, content: Option<String>) -> String {
     let response_line =HttpHeaders::set_http(status_code);
     let date_header =  HttpHeaders::Date.value();
     let name_header =  HttpHeaders::Server.value();
@@ -35,7 +35,7 @@ pub fn write_http_response(response_writer : &ResponseWriter, payload: Option<St
     let mut http_headers = String::from("");
 
     if Some(&payload) == None{
-        http_headers = build_http_headers(status_code, None);
+        http_headers = build_http_payload(status_code, None);
     }else{
         http_headers = payload.unwrap();
     }
