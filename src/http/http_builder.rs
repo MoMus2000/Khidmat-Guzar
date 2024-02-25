@@ -1,21 +1,23 @@
+use std::borrow::Borrow;
 use std::io::Write;
 
 use super::response_writer::ResponseWriter;
 use crate::http::http_headers::{self, HttpHeaders};
+use crate::http;
 
-pub fn build_http_payload(status_code : i32, content: Option<String>) -> String {
+pub fn build_http_payload(status_code : i32, content: Option<http::http_content::http_content>) -> String {
     let response_line =HttpHeaders::set_http(status_code);
     let date_header =  HttpHeaders::Date.value();
     let name_header =  HttpHeaders::Server.value();
 
     let content_header = match &content{
        Some(data) => {
-            HttpHeaders::set_content_and_length("text/html", data.len())
+            HttpHeaders::set_content_and_length("text/html", data.content_length)
        }
        _ => {Default::default()}
     };
 
-    let payload = content.unwrap();
+    let payload = content.unwrap().content;
 
     let blank_line = "\r\n";
 
