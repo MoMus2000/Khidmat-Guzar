@@ -17,7 +17,7 @@ mod tests {
     fn set_http_status_201(response_writer : &mut ResponseWriter, _request : http_request::HttpRequest){
         println!("Hello World! ");
         response_writer.write_status_code(201);
-        http::http_builder::write_http_status(response_writer);
+        http::http_builder::write_http_response(response_writer, None);
         println!("Wrote the status code")
     }
 

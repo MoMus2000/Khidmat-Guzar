@@ -53,7 +53,7 @@ impl HttpHeaders {
         }
     }
 
-    pub fn set_content_and_length(&self, content_type: &str, content_length: i32) -> String{
+    pub fn set_content_and_length(content_type: &str, content_length: usize) -> String{
         format!("Content-Type: {}\r\nContent-Length: {}",content_type, content_length)
     }
 }

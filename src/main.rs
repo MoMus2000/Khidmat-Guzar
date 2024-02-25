@@ -6,8 +6,9 @@
 
 use crate::server::HTTP_Server;
 use crate::http::http_request;
-use crate::http::http_builder::write_http_status;
+use crate::http::http_builder::write_http_response;
 use crate::http::response_writer::ResponseWriter;
+use crate::http::http_content::http_content;
 
 mod server;
 mod http_server;
@@ -16,7 +17,16 @@ mod http;
 fn print_hello_world(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
     println!("The called operation is {}", request.method);
     response_writer.write_status_code(200);
-    write_http_status(&response_writer);
+    write_http_response(&response_writer, None);
+}
+
+fn serve_html_file(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
+    let content = http_content::serve_static_file(response_writer, request, 
+        "./assets/index.html".to_string(), "text/html".to_string());
+    
+    response_writer.write_status_code(200);
+    let headers = http::http_builder::build_http_headers(200, Some(content));
+    write_http_response(&response_writer, Some(headers));
 }
 
 fn main() {
@@ -25,6 +35,7 @@ fn main() {
     let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
     router.add_route("/", "GET", print_hello_world);
+    router.add_route("/file", "GET", serve_html_file);
 
     http_server.attach_router(router);
 

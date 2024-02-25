@@ -74,7 +74,7 @@ impl HTTP_Server for HttpServer{
                                 Err(error) => {
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(500);
-                                    http::http_builder::write_http_status(&rw);
+                                    http::http_builder::write_http_response(&rw, None);
                                     eprintln!("Error parsing request: {}", error);
                                     panic!("Path NOT Found");
                                 }
@@ -86,7 +86,7 @@ impl HTTP_Server for HttpServer{
 
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(500);
-                                    http::http_builder::write_http_status(&rw);
+                                    http::http_builder::write_http_response(&rw, None);
                                     panic!("Internal erorr please check");
 
                             }).fetch_function_based_on_path(&parsed_request.path);
@@ -101,7 +101,7 @@ impl HTTP_Server for HttpServer{
                                     println!("Function not found");
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(404);
-                                    http::http_builder::write_http_status(&rw);
+                                    http::http_builder::write_http_response(&rw, None);
                                 }
                             }
 
