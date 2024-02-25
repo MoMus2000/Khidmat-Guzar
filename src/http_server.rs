@@ -98,7 +98,6 @@ impl HTTP_Server for HttpServer{
                                     parsed_request);
                                 }
                                 None => {
-                                    println!("Function not found");
                                     let mut rw = ResponseWriter::new(stream_data.try_clone().unwrap());
                                     rw.write_status_code(404);
                                     http::http_builder::write_http_response(&rw, None);

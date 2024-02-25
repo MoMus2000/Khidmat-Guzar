@@ -10,7 +10,7 @@ pub struct ResponseWriter{
 impl ResponseWriter{
     pub fn new(stream : TcpStream) -> ResponseWriter{
         ResponseWriter{
-            stream: stream,
+            stream,
             status_code: Default::default(),
             headers: HashMap::<String, String>::new()
         } 

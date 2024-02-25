@@ -7,8 +7,10 @@ A http/1.1 implementation from scratch.
 ### Initialization: آغاز
 
 ```rust
+
 let http_server = http_server::HTTPServer::new();
 http_server.start_server();
+
 ```
 
 ### Routing: راستہ نمائی
@@ -28,6 +30,7 @@ http_server.attach_router(router);
 ### Serve Static files: ثابت فائلوں کی فراہمی
 
 ```rust
+
 fn serve_html_file(response_writer : &mut ResponseWriter,
  request : http_request::HttpRequest){
     let content = http_content::serve_static_file(response_writer, request, 
@@ -70,4 +73,5 @@ fn main() {
 
     http_server.start_server();
 }
+
 ```

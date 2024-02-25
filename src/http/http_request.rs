@@ -1,4 +1,4 @@
-use std::{char, collections::HashMap, hash::Hash};
+use std::{char, collections::HashMap};
 
 #[derive(Debug, Clone)]
 pub struct HttpRequest{
@@ -8,6 +8,49 @@ pub struct HttpRequest{
 }
 
 impl HttpRequest{
+
+    fn parse_headers(start_index : usize, payload: Vec<char>) -> Option<HashMap<String, String>>{
+
+        let new_line = 0xA as char;
+        let mut i = start_index;
+        let mut header_map = HashMap::<String,String>::new();
+        let mut char_pointer = String::from("");
+        let mut value_pointer = String::from("");
+
+        while i < payload.len(){
+
+            if payload[i] == ':'{
+                if i < payload.len(){
+                    i+= 1
+                }
+
+                while payload[i] != new_line{
+                    value_pointer.push(payload[i]);
+                    i += 1;
+                }
+
+                let modified_char_pointer = char_pointer
+                    .replace("\r", "").replace("\n", "");
+                let modified_value_pointer = value_pointer
+                    .replace("\r", "").replace("\n", "");
+
+                header_map.insert(modified_char_pointer.trim().to_string().clone(),
+                 modified_value_pointer.trim().to_string().clone());
+
+                char_pointer.clear();
+                value_pointer.clear();
+
+            }
+
+            char_pointer.push(payload[i]);
+            i+=1
+
+        }
+
+        Some(header_map)
+
+    }
+
     pub fn parse_request(payload: &str) -> Result<HttpRequest, &'static str> {
         println!("{:?}", payload);
         let payload: Vec<char> = payload.chars().collect();
@@ -26,28 +69,8 @@ impl HttpRequest{
             i += 1;
         }
 
-        let mut char_pointer = String::from("");
-        let mut header_map = HashMap::<String,String>::new();
+        let header_map = HttpRequest::parse_headers(i, payload);
 
-        let mut current_key = String::from("");
-
-        while i < payload.len(){
-            if payload[i] == ':'{
-                current_key = char_pointer.clone();
-                char_pointer.clear();
-                if i < payload.len(){
-                    i+= 1
-                }
-            }
-            if payload[i] == new_line{
-                header_map.insert(current_key.clone(), char_pointer.clone());
-            }
-            char_pointer.push(payload[i]);
-            i+=1
-        }
-
-        println!("{:?}", header_map);
-    
         if parsed_result.len() != 2 {
             return Err("Invalid request format");
         }
@@ -58,7 +81,7 @@ impl HttpRequest{
         Ok(HttpRequest {
             method: method_parsed,
             path: path_parsed,
-            headers: None,
+            headers: header_map,
         })
     }
 }
