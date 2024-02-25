@@ -3,90 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
     <title>Prettier Page</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        header {
-            background-color: #3498db;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        header h1 {
-            color: #fff;
-            margin: 0;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #2980b9;
-            padding: 10px 0;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        nav a:hover {
-            color: #ecf0f1;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            margin: 20px;
-            text-align: center;
-        }
-
-        h2 {
-            color: #3498db;
-        }
-
-        p {
-            color: #555;
-            line-height: 1.6;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #217dbb;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -94,18 +12,20 @@
     </header>
 
     <nav>
-        <a href="/file">Home</a>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        <a href="/content">Contact</a>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
     </nav>
 
     <div class="container">
         <h2>Welcome to Our Beautiful Page</h2>
-        <p>This is a simple example of a beautiful HTML page with inline CSS. Enjoy the stunning design and dummy content.</p>
+        <p>This is a simple example of a beautiful HTML page with separate CSS and JS files. Enjoy the stunning design and dummy content.</p>
         <img src="https://via.placeholder.com/800x400" alt="Placeholder Image">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod vestibulum ligula, vel tincidunt mauris consequat sit amet. Curabitur ac risus vel lacus commodo facilisis. Proin vel eros non urna hendrerit ullamcorper a ac lacus.</p>
-        <button>Click Me</button>
+        <button id="clickMeBtn">Click Me</button>
     </div>
+
+    <script src="/script.js"></script>
 </body>
 </html>
