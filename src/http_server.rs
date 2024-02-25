@@ -56,6 +56,7 @@ impl HTTP_Server for HttpServer{
     }
 
     fn close(&mut self) {
+        println!("Running set to false");
         self.running = false;
     }
 

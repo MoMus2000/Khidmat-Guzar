@@ -67,20 +67,18 @@ mod tests {
 
     #[test]
     fn test_router_not_found() {
-        let http_server = Arc::new(Mutex::new(http_server::HttpServer::new("localhost".to_string(), "6969".to_string())));
+        let mut http_server = http_server::HttpServer::new("localhost".to_string(), "6969".to_string());
 
         let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
         router.add_route("/", "GET", print_hello_world);
 
-        http_server.lock().unwrap().attach_router(router);
-
-        let server_thread = Arc::clone(&http_server);
+        http_server.attach_router(router);
 
         thread::spawn(move || {
             let result = std::panic::catch_unwind(move || {
                 println!("Spawning the webserver");
-                server_thread.lock().unwrap().start_server();
+                http_server.start_server();
                 println!("Closing the server");
             });
         
@@ -89,8 +87,6 @@ mod tests {
             }
 
         });
-
-        http_server.lock().unwrap().close();
 
         let resp = reqwest::blocking::get("http://localhost:6969/some_random_path");
 
@@ -161,6 +157,39 @@ mod tests {
         let resp = resp.expect("Oh no something went wrong !");
 
         assert!(resp.status().as_u16() == 201, "Expected 201 but got {}", resp.status())
+
+    }
+
+    #[test]
+    fn test_http_start_close(){
+        let http_server = Arc::new(Mutex::new(http_server::HttpServer::new("localhost".to_string(), "6969".to_string())));
+
+        let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
+
+        router.add_route("/", "GET", set_http_status_201);
+
+        http_server.lock().unwrap().attach_router(router);
+
+        let cloned_server = Arc::clone(&http_server);
+        let server_thread = thread::spawn(
+            move || {
+            let result = std::panic::catch_unwind(move || {
+                println!("Spawning the webserver");
+                cloned_server.lock().unwrap().start_server();
+                println!("Stopping the http Server");
+            });
+        
+            if let Err(err) = result {
+                eprintln!("Thread panicked: {:?}", err);
+            }
+
+        });
+
+        http_server.lock().unwrap().close();
+
+        println!("Waiting for server thread to finish");
+        server_thread.join().unwrap();
+        println!("Execution complete");
 
     }
 
