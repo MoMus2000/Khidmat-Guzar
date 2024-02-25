@@ -33,7 +33,7 @@ fn main() {
 
     let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
 
-    router.add_route("/", "GET", print_hello_world);
+    router.add_route("/", "GET", serve_html_file);
     router.add_route("/file", "GET", serve_html_file);
 
     http_server.attach_router(router);
