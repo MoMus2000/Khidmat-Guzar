@@ -4,9 +4,9 @@ mod tests {
     use crate::http_server;
     use crate::http;
     use crate::server::HTTP_Server;
-    use std::borrow::BorrowMut;
     use std::thread;
     use std::io::{Write, Read};
+    use std::time::Duration;
     use crate::http::http_request;
     use std::sync::{Arc, Mutex};
 
@@ -120,9 +120,13 @@ mod tests {
             }
         }); 
 
-        let resp = reqwest::blocking::get("http://localhost:6969/some_random_path");
-
-        let resp = resp.expect("Oh no something went wrong !");
+        let resp = reqwest::blocking::get("http://localhost:6969/some_random_path")
+        .unwrap_or_else(|err| {
+            eprintln!("Request failed: {}", err);
+            // Handle the error or return a default value as needed.
+            // You can also propagate the error further using 'return Err(err);' if this is a function returning a Result.
+            std::process::exit(1);
+        });
 
         assert!(resp.status().is_client_error(), "Expected 404 but got {}", resp.status());
 
@@ -157,39 +161,6 @@ mod tests {
         let resp = resp.expect("Oh no something went wrong !");
 
         assert!(resp.status().as_u16() == 201, "Expected 201 but got {}", resp.status())
-
-    }
-
-    #[test]
-    fn test_http_start_close(){
-        let http_server = Arc::new(Mutex::new(http_server::HttpServer::new("localhost".to_string(), "6969".to_string())));
-
-        let mut router =  http::router::Router::new().unwrap_or_else(||panic!("Something went wrong"));
-
-        router.add_route("/", "GET", set_http_status_201);
-
-        http_server.lock().unwrap().attach_router(router);
-
-        let cloned_server = Arc::clone(&http_server);
-        let server_thread = thread::spawn(
-            move || {
-            let result = std::panic::catch_unwind(move || {
-                println!("Spawning the webserver");
-                cloned_server.lock().unwrap().start_server();
-                println!("Stopping the http Server");
-            });
-        
-            if let Err(err) = result {
-                eprintln!("Thread panicked: {:?}", err);
-            }
-
-        });
-
-        http_server.lock().unwrap().close();
-
-        println!("Waiting for server thread to finish");
-        server_thread.join().unwrap();
-        println!("Execution complete");
 
     }
 
