@@ -49,7 +49,6 @@ impl Router {
     }
 
     pub fn fetch_function_based_on_path(&self, principal_path: &str) -> Option<RouterElement>{
-        let (principal_path, query_params) = Router::strip_query_params(principal_path);
         for element in &self.router_elem{
             if element.path.trim() == principal_path.trim(){
                 return Some(element.clone())

@@ -4,10 +4,20 @@ use std::{char, collections::HashMap};
 pub struct HttpRequest{
     pub method: String,
     pub path: String,
-    pub headers: Option<HashMap<String, String>>
+    pub headers: Option<HashMap<String, String>>,
+    pub query_params: Option<String>
 }
 
 impl HttpRequest{
+
+    fn strip_query_params(principal_path: String) -> (Option<String>, Option<String>){
+        let split_path = principal_path.split("?");
+        let vec : Vec<&str> = split_path.collect();
+        if vec.len() >= 2{
+            return (Some(vec[0].to_string()), Some(vec[1].to_string()))
+        }
+        (None, None)
+    }
 
     fn parse_headers(start_index : usize, payload: Vec<char>) -> Option<HashMap<String, String>>{
 
@@ -83,11 +93,22 @@ impl HttpRequest{
     
         let method_parsed = parsed_result.get(0).cloned().unwrap_or_default();
         let path_parsed = parsed_result.get(1).cloned().unwrap_or_default();
-    
+
+        let (principal_path, query_params) = HttpRequest::strip_query_params(path_parsed.clone());
+
+        if principal_path.is_some()  && query_params.is_some(){
+            return Ok(HttpRequest {
+                method: method_parsed,
+                path: principal_path.unwrap(),
+                headers: header_map,
+                query_params
+            })
+        }
         Ok(HttpRequest {
             method: method_parsed,
             path: path_parsed,
             headers: header_map,
+            query_params:None 
         })
     }
 
