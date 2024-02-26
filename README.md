@@ -78,6 +78,6 @@ fn main() {
 
 ### Tests
 
-```shell
-./run-tests.sh # Currently not working, need to fix.
+```bash
+./run-tests.sh 
 ```
