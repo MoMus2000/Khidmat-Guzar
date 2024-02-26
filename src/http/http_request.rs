@@ -52,7 +52,7 @@ impl HttpRequest{
     }
 
     pub fn parse_request(payload: &str) -> Result<HttpRequest, &'static str> {
-        println!("{:?}", payload);
+
         let payload: Vec<char> = payload.chars().collect();
         let new_line = 0xA as char;
         let mut i = 0;
@@ -90,4 +90,5 @@ impl HttpRequest{
             headers: header_map,
         })
     }
+
 }

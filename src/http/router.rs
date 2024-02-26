@@ -42,7 +42,14 @@ impl Router {
         })
     }
 
+    fn strip_query_params(principal_path: &str) -> (&str, &str){
+        let split_path = principal_path.split("?");
+        let vec : Vec<&str> = split_path.collect();
+        (vec[0], vec[1])
+    }
+
     pub fn fetch_function_based_on_path(&self, principal_path: &str) -> Option<RouterElement>{
+        let (principal_path, query_params) = Router::strip_query_params(principal_path);
         for element in &self.router_elem{
             if element.path.trim() == principal_path.trim(){
                 return Some(element.clone())

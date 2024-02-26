@@ -14,11 +14,6 @@ mod server;
 mod http_server;
 mod http;
 
-fn print_hello_world(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
-    println!("The called operation is {}", request.method);
-    response_writer.write_status_code(200);
-    write_http_response(&response_writer, None);
-}
 
 fn serve_html_file(response_writer : &mut ResponseWriter, request : http_request::HttpRequest){
     let content = http_content::serve_static_file(response_writer, request, 
