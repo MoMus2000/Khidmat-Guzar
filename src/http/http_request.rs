@@ -74,6 +74,12 @@ impl HttpRequest{
         if parsed_result.len() != 2 {
             return Err("Invalid request format");
         }
+
+        if header_map.as_ref().unwrap().is_empty(){
+            return Err("Invalid request format");
+        }
+
+        println!("{:?}", header_map);
     
         let method_parsed = parsed_result.get(0).cloned().unwrap_or_default();
         let path_parsed = parsed_result.get(1).cloned().unwrap_or_default();

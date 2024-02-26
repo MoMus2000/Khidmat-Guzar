@@ -11,12 +11,18 @@ pub fn build_http_payload(status_code : i32, content: Option<http::http_content:
 
     let content_header = match &content{
        Some(data) => {
-            HttpHeaders::set_content_and_length("text/html", data.content_length)
+            HttpHeaders::set_content_and_length(content.as_ref().unwrap().content_type.as_str(), data.content_length)
        }
        _ => {Default::default()}
     };
 
-    let payload = content.unwrap().content;
+    let payload : String;
+
+    if content.is_some(){
+        payload = content.unwrap().content;
+    }else{
+        payload = String::from("");
+    }
 
     let blank_line = "\r\n";
 
@@ -35,7 +41,7 @@ pub fn write_http_response(response_writer : &ResponseWriter, payload: Option<St
 
     let mut http_headers = String::from("");
 
-    if Some(&payload) == None{
+    if payload.is_none(){
         http_headers = build_http_payload(status_code, None);
     }else{
         http_headers = payload.unwrap();
